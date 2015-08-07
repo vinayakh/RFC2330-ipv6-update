@@ -6,12 +6,12 @@ Network Working Group                                          A. Morton
 Internet-Draft                                                 AT&T Labs
 Updates: 2330 (if approved)                                    J. Fabini
 Intended status: Informational           Vienna University of Technology
-Expires: February 4, 2016                                      N. Elkins
+Expires: February 5, 2016                                      N. Elkins
                                                     Inside Products, Inc
                                                             M. Ackermann
                                       Blue Cross Blue Shield of Michigan
                                                                 V. Hegde
-                                                          August 3, 2015
+                                                          August 4, 2015
 
 
    Updates for IPPM's Active Metric Framework: Packets of Type-P and
@@ -23,9 +23,9 @@ Abstract
    This memo updates the IP Performance Metrics (IPPM) Framework RFC
    2330 with new considerations for measurement methodology and testing.
    The memo updates the definition of standard-formed packets in RFC
-   2330 to include coverage of IPv6 packets.  It also augments examples
-   of distinguishing aspects of packets, referred to as Type-P for test
-   packets.
+   2330 to include evaluation of IPv6 packets.  It also augments
+   examples of distinguishing aspects of packets, referred to as Type-P
+   for test packets.
 
 Requirements Language
 
@@ -48,12 +48,12 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 4, 2016.
+   This Internet-Draft will expire on February 5, 2016.
 
 
 
 
-Morton, et al.          Expires February 4, 2016                [Page 1]
+Morton, et al.          Expires February 5, 2016                [Page 1]
 
 Internet-Draft            Std-Formed and Type-P              August 2015
 
@@ -81,7 +81,7 @@ Table of Contents
    4.  Standard-Formed Packets . . . . . . . . . . . . . . . . . . .   4
    5.  Conclusions . . . . . . . . . . . . . . . . . . . . . . . . .   6
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
    8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
@@ -109,13 +109,13 @@ Table of Contents
 
 
 
-Morton, et al.          Expires February 4, 2016                [Page 2]
+Morton, et al.          Expires February 5, 2016                [Page 2]
 
 Internet-Draft            Std-Formed and Type-P              August 2015
 
 
-   Other header features have come into wide use.  This memo seeks to
-   provide the needed updates.
+   Optional Extension header features in IPv6 have seen growing use.
+   This memo seeks to provide the needed updates.
 
 2.  Scope
 
@@ -141,10 +141,10 @@ Internet-Draft            Std-Formed and Type-P              August 2015
    measurement.  Consider an IP-connectivity metric: one obtains
    different results depending on whether one is interested in
    connectivity for packets destined for well-known TCP ports or
-   unreserved UDP ports, or those with invalid IP checksums, or those
+   unreserved UDP ports, or those with invalid IPv4 checksums, or those
    with TTL or Hop Limit of 16, for example.  In some circumstances
    these distinctions will be highly interesting (for example, if
-   Diffserv [RFC2780], ECN [RFC3168], Router Alert, hop-by-hop
+   Diffserv [RFC2780], ECN [RFC3168], Router Alert, Hop-by-hop
    extensions [RFC7045], or Flow Labels [RFC6437] are used, or in the
    presence of firewalls or RSVP reservations).
 
@@ -157,18 +157,22 @@ Internet-Draft            Std-Formed and Type-P              August 2015
    fruitfully defined using generic Type-P definitions which are then
    made specific when performing actual measurements.
 
-   If the information constituting Type-P at the Source was found to
-   have changed at the Destination, then the modified values SHOULD be
-   noted and reported with the results.
+   If the information constituting Type-P at the Source is found to have
+   changed at the Destination, then the modified values SHOULD be noted
+   and reported with the results.  Some modifications occur according to
+   the conditions encountered in transit (such as congestion
+   notification) or due to the requirements of segments of the Source to
 
 
 
-
-
-Morton, et al.          Expires February 4, 2016                [Page 3]
+Morton, et al.          Expires February 5, 2016                [Page 3]
 
 Internet-Draft            Std-Formed and Type-P              August 2015
 
+
+   Destination path.  For example, the packet length will change if IP
+   header conversion to the alternate version/address family, or if
+   optional extension headers are added or removed.
 
    Whenever a metric's value depends on the type of the packets involved
    in the metric, the metric's name will include either a specific type
@@ -212,19 +216,21 @@ Internet-Draft            Std-Formed and Type-P              August 2015
    o  The version field is 4; the header length is >= 5; the checksum is
       correct.
 
+
+
+
+
+
+Morton, et al.          Expires February 5, 2016                [Page 4]
+
+Internet-Draft            Std-Formed and Type-P              August 2015
+
+
    o  Either the packet possesses sufficient TTL to travel from the
       source to the destination if the TTL is decremented by one at each
       hop, or it possesses the maximum TTL of 255.
 
    o  It does not contain IP options unless explicitly noted.
-
-
-
-
-Morton, et al.          Expires February 4, 2016                [Page 4]
-
-Internet-Draft            Std-Formed and Type-P              August 2015
-
 
    Alternatively, an IPv6 packet is standard-formed if it meets the
    following criteria:
@@ -241,25 +247,25 @@ Internet-Draft            Std-Formed and Type-P              August 2015
 
    o  All parameters used in the header and extension headers will be
       found in the IANA Registry of Internet Protocol Version 6 (IPv6)
-      Parameters [RFC7045].
+      Parameters, partly specified in [RFC7045].
 
    The topic of IPv6 extension headers brings current controversies into
-   focus.  The following additional criteria apply when IPv6 extension
-   headers are present:
+   focus.  The following additional considerations apply when IPv6
+   extension headers are present:
 
    o  Extension header modification: In hop-by-hop and Destination
       Options headers, some TLV encoded options may be permitted to
-      change at intermediate nodes while in transit.
+      change at intermediate nodes while in transit.  The packet may be
+      standard-formed, with a corresponding Type-P.
 
    o  Extension header insertion or deletion: It is possible that
       extension headers could be added to, or removed from the header
-      chain.
+      chain.  The packet may be standard-formed, with a corresponding
+      Type-P.
 
-   o  A change in length (from the corresponding packet observed at the
-      source) is a significant factor in Internet measurement, and
-      requires withdrawal of "standard-formed" status if the
-      corresponding source packet had qualified with a different length
-      (end-to-end principle).
+   o  A change in packet length (from the corresponding packet observed
+      at the source) or header modification is a significant factor in
+      Internet measurement, and requires a new Type-P to be reported.
 
    We further require that if a packet is described as having a "length
    of B octets", then 0 <= B <= 65535; and if B is the payload length in
@@ -269,19 +275,18 @@ Internet-Draft            Std-Formed and Type-P              August 2015
    restrict the length of standard-formed packets that can successfully
    traverse the path.
 
+
+
+Morton, et al.          Expires February 5, 2016                [Page 5]
+
+Internet-Draft            Std-Formed and Type-P              August 2015
+
+
    So, for example, one might imagine defining an IP connectivity metric
    as "IP-type-P-connectivity for standard-formed packets with the IP
    Diffserv field set to 0", or, more succinctly, "IP-type-
    P-connectivity with the IP Diffserv Field set to 0", since standard-
    formed is already implied by convention.  Changing the contents of a
-
-
-
-Morton, et al.          Expires February 4, 2016                [Page 5]
-
-Internet-Draft            Std-Formed and Type-P              August 2015
-
-
    field, such as the Diffserv Code Point, ECN bits, or Flow Label may
    have a profound affect on packet handling during transit, but does
    not affect a packet's status as standard-formed.
@@ -324,25 +329,26 @@ Internet-Draft            Std-Formed and Type-P              August 2015
    [I-D.ietf-lmap-framework], which covers active and passive
    techniques.
 
-7.  IANA Considerations
-
-   This memo makes no requests of IANA.
 
 
 
 
-
-
-Morton, et al.          Expires February 4, 2016                [Page 6]
+Morton, et al.          Expires February 5, 2016                [Page 6]
 
 Internet-Draft            Std-Formed and Type-P              August 2015
 
+
+7.  IANA Considerations
+
+   This memo makes no requests of IANA.
 
 8.  Acknowledgements
 
    The authors thank Brian Carpenter for identifying the lack of IPv6
    coverage in IPPM's Framework, and for listing additional
-   distinguishing factors for packets of Type-P.
+   distinguishing factors for packets of Type-P.  Both Brian and Fred
+   Baker discussed many of the interesting aspects of IPv6 with the co-
+   authors, leading to a more solid first draft: thank you both.
 
 9.  References
 
@@ -381,18 +387,17 @@ Internet-Draft            Std-Formed and Type-P              August 2015
               DOI 10.17487/RFC3432, November 2002,
               <http://www.rfc-editor.org/info/rfc3432>.
 
+
+
+Morton, et al.          Expires February 5, 2016                [Page 7]
+
+Internet-Draft            Std-Formed and Type-P              August 2015
+
+
    [RFC4656]  Shalunov, S., Teitelbaum, B., Karp, A., Boote, J., and M.
               Zekauskas, "A One-way Active Measurement Protocol
               (OWAMP)", RFC 4656, DOI 10.17487/RFC4656, September 2006,
               <http://www.rfc-editor.org/info/rfc4656>.
-
-
-
-
-Morton, et al.          Expires February 4, 2016                [Page 7]
-
-Internet-Draft            Std-Formed and Type-P              August 2015
-
 
    [RFC5357]  Hedayat, K., Krzanowski, R., Morton, A., Yum, K., and J.
               Babiarz, "A Two-Way Active Measurement Protocol (TWAMP)",
@@ -434,21 +439,22 @@ Internet-Draft            Std-Formed and Type-P              August 2015
 
 9.2.  Informative References
 
+
+
+
+
+
+
+Morton, et al.          Expires February 5, 2016                [Page 8]
+
+Internet-Draft            Std-Formed and Type-P              August 2015
+
+
    [I-D.ietf-lmap-framework]
               Eardley, P., Morton, A., Bagnulo, M., Burbridge, T.,
               Aitken, P., and A. Akhter, "A framework for Large-Scale
               Measurement of Broadband Performance (LMAP)", draft-ietf-
               lmap-framework-14 (work in progress), April 2015.
-
-
-
-
-
-
-Morton, et al.          Expires February 4, 2016                [Page 8]
-
-Internet-Draft            Std-Formed and Type-P              August 2015
-
 
    [Mat98]    Mathis, M., "Empirical Bulk Transfer Capacity", IP
               Performance Metrics Working Group report in Proceeding of
@@ -485,6 +491,21 @@ Authors' Addresses
    URI:   http://home.comcast.net/~acmacm/
 
 
+
+
+
+
+
+
+
+
+
+
+Morton, et al.          Expires February 5, 2016                [Page 9]
+
+Internet-Draft            Std-Formed and Type-P              August 2015
+
+
    Joachim Fabini
    Vienna University of Technology
    Gusshausstrasse 25/E389
@@ -495,15 +516,6 @@ Authors' Addresses
    Fax:   +43 1 58801 38898
    Email: Joachim.Fabini@tuwien.ac.at
    URI:   http://www.tc.tuwien.ac.at/about-us/staff/joachim-fabini/
-
-
-
-
-
-
-Morton, et al.          Expires February 4, 2016                [Page 9]
-
-Internet-Draft            Std-Formed and Type-P              August 2015
 
 
    Nalini Elkins
@@ -545,16 +557,4 @@ Internet-Draft            Std-Formed and Type-P              August 2015
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-Morton, et al.          Expires February 4, 2016               [Page 10]
+Morton, et al.          Expires February 5, 2016               [Page 10]
