@@ -43,7 +43,7 @@
     </author>
 
     <author fullname="Joachim Fabini" initials="J." surname="Fabini">
-      <organization>Vienna University of Technology</organization>
+      <organization>TU Wien</organization>
 
       <address>
         <postal>
@@ -75,7 +75,7 @@
         <postal>
           <street/>
 
-          <city>Carmel Valley </city>
+          <city>Carmel Valley</city>
 
           <region>CA</region>
 
@@ -146,15 +146,18 @@
       </address>
     </author>
 
-    <date day="5" month="August" year="2015"/>
+    <date day="6" month="August" year="2015"/>
 
     <abstract>
       <t>This memo updates the IP Performance Metrics (IPPM) Framework RFC
       2330 with new considerations for measurement methodology and testing.
       The memo updates the definition of standard-formed packets in RFC 2330
-      to include evaluation of IPv6 packets. It also augments examples of
-      distinguishing aspects of packets, referred to as Type-P for test
-      packets.</t>
+      to include IPv6 packets. It also augments distinguishing aspects of
+      packets, referred to as Type-P for test packets in RFC 2330.</t>
+
+      <t>Two points (at least) are worthwhile discussing further: extent of
+      coverage for 6LO and IPv6 Header Compression, and the continued need to
+      define a "minimal standard-formed packet".</t>
     </abstract>
 
     <note title="Requirements Language">
@@ -207,15 +210,18 @@
     </section>
 
     <section title="Packets of Type-P">
-      <t>A fundamental property of many Internet metrics is that the value of
-      the metric depends on the type of IP packet(s) used to make the
-      measurement. Consider an IP-connectivity metric: one obtains different
+      <t>A fundamental property of many Internet metrics is that the measured
+      value of the metric depends on characteristics of the IP packet(s) used
+      to make the measurement. Potential influencing factors include IP header
+      fields and their values, but also higher-layer protocol headers and
+      their values. Consider an IP-connectivity metric: one obtains different
       results depending on whether one is interested in connectivity for
       packets destined for well-known TCP ports or unreserved UDP ports, or
       those with invalid IPv4 checksums, or those with TTL or Hop Limit of 16,
-      for example. In some circumstances these distinctions will be highly
-      interesting (for example, if Diffserv <xref target="RFC2780"/>, ECN
-      <xref target="RFC3168"/>, Router Alert, Hop-by-hop extensions <xref
+      for example. In some circumstances these distinctions will result in
+      special treatment of packets in intermediate nodes and end systems (for
+      example, if Diffserv <xref target="RFC2780"/>, ECN <xref
+      target="RFC3168"/>, Router Alert, Hop-by-hop extensions <xref
       target="RFC7045"/>, or Flow Labels <xref target="RFC6437"/> are used, or
       in the presence of firewalls or RSVP reservations).</t>
 
@@ -243,13 +249,12 @@
       occur according to the conditions encountered in transit (such as
       congestion notification) or due to the requirements of segments of the
       Source to Destination path. For example, the packet length will change
-      if IP header conversion to the alternate version/address family, or if
-      optional extension headers are added or removed. Local policies in
-      intermediate nodes based on examination of IPv6 extension headers may
-      affect measurement repeatability, especially if the policy involves
-      random assignment to resources in the node, for example. If intermediate
-      nodes follow the recommendations of <xref target="RFC7045"/>,
-      repeatability may be improved to some degree. </t>
+      if IP headers are converted to the alternate version/address family, or
+      if optional Extension Headers are added or removed. Local policies in
+      intermediate nodes based on examination of IPv6 Extension Headers may
+      affect measurement repeatability. If intermediate nodes follow the
+      recommendations of <xref target="RFC7045"/>, repeatability may be
+      improved to some degree.</t>
 
       <t>A closely related note: it would be very useful to know if a given
       Internet component treats equally a class C of different types of
@@ -270,82 +275,87 @@
 
           <t hangText="+">It is not an IP fragment.</t>
 
-          <t hangText="+">The source and destination addresses correspond to
+          <t hangText="+">The Source and Destination addresses correspond to
           the intended Source and Destination, including Multicast Destination
           addresses.</t>
 
           <t hangText="+">If a transport header is present, it contains a
           valid checksum and other valid fields.</t>
-        </list>Additionally, an IPv4 packet is standard-formed if it meets the
-      following criteria:<list style="symbols">
-          <t>The version field is 4; the header length is &gt;= 5; the
-          checksum is correct.</t>
+        </list>For an IPv4 <xref target="RFC0791">(</xref> and updates) packet
+      to be standard-formed, the following additional criteria are
+      required:<list style="symbols">
+          <t>The version field is 4</t>
+
+          <t>The Internet Header Length (IHL) value is &gt;= 5; the checksum
+          is correct.</t>
 
           <t>Its total length as given in the IPv4 header corresponds to the
           size of the IPv4 header plus the size of the payload.</t>
 
           <t>Either the packet possesses sufficient TTL to travel from the
-          source to the destination if the TTL is decremented by one at each
+          Source to the Destination if the TTL is decremented by one at each
           hop, or it possesses the maximum TTL of 255.</t>
 
           <t>It does not contain IP options unless explicitly noted.</t>
         </list></t>
 
-      <t>Alternatively, an IPv6 packet is standard-formed if it meets the
-      following criteria:<list style="symbols">
+      <t>For an IPv6 (<xref target="RFC2460"/> and updates) packet to be
+      standard-formed, the following criteria are required:<list
+          style="symbols">
           <t>The version field is 6.</t>
 
           <t>Its total length corresponds to the size of the IPv6 header (40
-          octets) plus the length of the payload (including extension headers)
+          octets) plus the length of the payload (including Extension Headers)
           as given in the IPv6 header.</t>
 
           <t>Either the packet possesses sufficient Hop Count to travel from
           the Source to the Destination if the Hop Count is decremented by one
           at each hop, or it possesses the maximum Hop Count of 255.</t>
 
-          <t>Either the packet does not contain IP extension headers, or it
+          <t>Either the packet does not contain IP Extension Headers, or it
           contains the correct number and type of headers as specified in the
-          packet, and the headers appear in the expected order (Next
-          Header).</t>
+          packet, and the headers appear in the standard-conforming order
+          (Next Header).</t>
 
-          <t>All parameters used in the header and extension headers will be
-          found in the IANA Registry of Internet Protocol Version 6 (IPv6)
+          <t>All parameters used in the header and Extension Headers are found
+          in the IANA Registry of Internet Protocol Version 6 (IPv6)
           Parameters, partly specified in <xref target="RFC7045"/>.</t>
         </list></t>
 
-      <t>Compressed IPv6 headers MUST be compliant with <xref
+      <t>Compressed IPv6 headers must be compliant with <xref
       target="RFC4494"/>, as updated by <xref target="RFC6282"/>, in order to
-      be declared "standard-formed". </t>
+      be declared "standard-formed".</t>
 
-      <t>The topic of IPv6 extension headers brings current controversies into
-      focus. The following additional considerations apply when IPv6 extension
-      headers are present:</t>
+      <t>The topic of IPv6 Extension Headers brings current controversies into
+      focus as noted by <xref target="RFC6564"/> and <xref target="RFC7045"/>.
+      The following additional considerations apply when IPv6 Extension
+      Headers are present:</t>
 
       <t><list style="symbols">
-          <t>Extension header inspection: Some intermediate nodes may inspect
+          <t>Extension Header inspection: Some intermediate nodes may inspect
           Extension Headers or the entire IPv6 packet while in transit. In
           exceptional cases, they may drop the packet or route via a
           sub-optimal path, and measurements may be unreliable or
           unrepeatable. The packet (if it arrives) may be standard-formed,
-          with a corresponding Type-P. </t>
+          with a corresponding Type-P.</t>
 
-          <t>Extension header modification: In Hop-by-Hop headers, some TLV
+          <t>Extension Header modification: In Hop-by-Hop headers, some TLV
           encoded options may be permitted to change at intermediate nodes
           while in transit. The resulting packet may be standard-formed, with
           a corresponding Type-P.</t>
 
-          <t>Extension header insertion or deletion: It is possible that
-          extension headers could be added to, or removed from the header
+          <t>Extension Header insertion or deletion: It is possible that
+          Extension Headers could be added to, or removed from the header
           chain. The resulting packet may be standard-formed, with a
           corresponding Type-P.</t>
 
           <t>A change in packet length (from the corresponding packet observed
-          at the source) or header modification is a significant factor in
+          at the Source) or header modification is a significant factor in
           Internet measurement, and requires a new Type-P to be reported.</t>
         </list>We further require that if a packet is described as having a
       "length of B octets", then 0 &lt;= B &lt;= 65535; and if B is the
       payload length in octets, then B &lt;= (65535-IP header size in octets,
-      including any extension headers). The jumbograms defined in <xref
+      including any Extension Headers). The jumbograms defined in <xref
       target="RFC2675"/> are not covered by this length analysis. In practice,
       the path MTU will restrict the length of standard-formed packets that
       can successfully traverse the path.</t>
@@ -366,7 +376,7 @@
 
           <t hangText="+">Its data payload is 0 octets.</t>
 
-          <t hangText="+">It contains no options or extension headers.</t>
+          <t hangText="+">It contains no options or Extension Headers.</t>
         </list>(Note that we do not define its protocol field, as different
       values may lead to different treatment by the network.)</t>
 
@@ -406,25 +416,26 @@
       coverage in IPPM's Framework, and for listing additional distinguishing
       factors for packets of Type-P. Both Brian and Fred Baker discussed many
       of the interesting aspects of IPv6 with the co-authors, leading to a
-      more solid first draft: thank you both.</t>
+      more solid first draft: thank you both. Thanks to Bill Jouris for an
+      editorial pass through the pre-00 text.</t>
     </section>
   </middle>
 
   <back>
     <references title="Normative References">
-      <?rfc include="reference.RFC.2119"?>
+      <?rfc include='reference.RFC.0791'?>
+
+      <?rfc include='reference.RFC.2119'?>
 
       <?rfc include='reference.RFC.2330'?>
 
-      <?rfc include='reference.RFC.2675'?>
+      <?rfc include='reference.RFC.2460'?>
 
-      <?rfc include='reference.RFC.2679'?>
+      <?rfc include='reference.RFC.2675'?>
 
       <?rfc include='reference.RFC.2780'?>
 
       <?rfc include='reference.RFC.3168'?>
-
-      <?rfc include='reference.RFC.3432'?>
 
       <?rfc include='reference.RFC.4494'?>
 
@@ -436,15 +447,11 @@
 
       <?rfc include='reference.RFC.5835'?>
 
-      <?rfc include='reference.RFC.6049'?>
-
       <?rfc include='reference.RFC.6282'?>
 
       <?rfc include='reference.RFC.6437'?>
 
-      <?rfc include='reference.RFC.6576'?>
-
-      <?rfc include='reference.RFC.6703'?>
+      <?rfc include='reference.RFC.6564'?>
 
       <?rfc include='reference.RFC.7045'?>
 
@@ -452,30 +459,7 @@
     </references>
 
     <references title="Informative References">
-      <?rfc include='reference.RFC.6808'?>
-
-      <?rfc include='reference.RFC.6985'?>
-
-      <?rfc include='reference.RFC.3148'?>
-
       <?rfc include='reference.I-D.ietf-lmap-framework'?>
-
-      <reference anchor="Mat98">
-        <front>
-          <title>Empirical Bulk Transfer Capacity</title>
-
-          <author fullname="Matt Mathis" initials="M." surname="Mathis">
-            <!-- fullname="M.Mathis" -->
-
-            <organization>Pittsburgh Supercomputing Center</organization>
-          </author>
-
-          <date day="" month="December" year="1998"/>
-        </front>
-
-        <seriesInfo name="IP Performance Metrics Working Group report in Proceeding of the Forty Third Internet Engineering Task Force, Orlando, FL."
-                    value="http://www.ietf.org/proceedings/98dec/slides/ippm-mathis-98dec.pdf"/>
-      </reference>
     </references>
   </back>
 </rfc>
